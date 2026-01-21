@@ -3,8 +3,4 @@ Flask
 Flask-SQLAlchemy
 Flask-Login
 Werkzeug
-torch
-transformers
-accelerate
-sentencepiece
-huggingface_hub
+requests

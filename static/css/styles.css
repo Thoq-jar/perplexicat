@@ -22,7 +22,7 @@ body {
 
 .layout {
     display: flex;
-    min-height: 100vh;
+    min-height: 90vh;
 }
 
 .main-content {
@@ -441,7 +441,7 @@ body {
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 90vh;
     max-width: 800px;
     margin: 0 auto;
     width: 100%;

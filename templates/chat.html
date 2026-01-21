@@ -2,6 +2,16 @@
 
 {% block content %}
 <div class="chat-container">
+    {% if current_user.is_authenticated and spaces %}
+    <div class="chat-header" style="display: flex; justify-content: flex-start; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border-color);">
+        <select id="space-select" class="model-select" style="max-width: 200px;">
+            <option value="">No Space</option>
+            {% for space in spaces %}
+                <option value="{{ space.id }}" {% if chat.space_id == space.id %}selected{% endif %}>{{ space.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
     <div class="chat-messages">
         {% for message in chat.messages %}
             <div class="message {{ message.role }}">
@@ -26,11 +36,6 @@
             <textarea id="search-input" class="search-input" placeholder="Ask follow-up..." autofocus></textarea>
             <div class="search-actions">
                 <div class="action-group">
-                    <select id="model-select" class="model-select">
-                        <option value="microsoft/phi-1_5" selected>Phi-1.5</option>
-                        <option value="gpt2">GPT-2</option>
-                        <option value="distilgpt2">DistilGPT-2</option>
-                    </select>
                     <button class="action-btn"><i data-lucide="plus"></i><span>Attach</span></button>
                 </div>
                 <div class="action-group">
@@ -42,7 +47,6 @@
 </div>
 
 <script>
-    // Handle follow-up questions
     document.addEventListener('DOMContentLoaded', () => {
         const textarea = document.getElementById('search-input');
         const submitBtn = document.getElementById('submit-btn');
@@ -63,9 +67,6 @@
                 const query = textarea.value.trim();
                 if (!query) return;
 
-                const modelSelect = document.getElementById('model-select');
-                const model = modelSelect ? modelSelect.value : 'microsoft/phi-1_5';
-
                 submitBtn.disabled = true;
                 submitBtn.style.opacity = '0.5';
 
@@ -75,7 +76,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ query: query, chat_id: chatId, model: model }),
+                        body: JSON.stringify({ query: query, chat_id: chatId, model: 'gemma3:4b' }),
                     });
 
                     if(response.status === 401 || response.redirected) {
@@ -90,7 +91,7 @@
 
                     const data = await response.json();
                     if (data.response) {
-                        location.reload(); // Simple reload to show new messages
+                        location.reload();
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -105,6 +106,37 @@
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSubmit();
+                }
+            });
+        }
+
+        const spaceSelect = document.getElementById('space-select');
+        if (spaceSelect && chatId) {
+            spaceSelect.addEventListener('change', async (e) => {
+                const spaceId = e.target.value;
+                
+                try {
+                    const response = await fetch(`/api/move_chat_to_space/${chatId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ space_id: spaceId ? parseInt(spaceId) : null }),
+                    });
+
+                    if(response.status === 401 || response.redirected) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
+                    if(!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `Server returned ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to move chat to space');
+                    location.reload();
                 }
             });
         }

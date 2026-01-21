@@ -16,20 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleSubmit = async() => {
             const query = textarea.value.trim();
             if(!query) return;
-
-            const modelSelect = document.getElementById('model-select');
-            const model = modelSelect ? modelSelect.value : 'microsoft/phi-1_5';
+            
+            const spaceSelect = document.getElementById('space-select');
+            const spaceId = spaceSelect ? spaceSelect.value : null;
 
             submitBtn.disabled = true;
             submitBtn.style.opacity = '0.5';
 
             try {
+                const body = {query: query, model: 'gemma3:4b'};
+                if(spaceId) {
+                    body.space_id = parseInt(spaceId);
+                }
+                
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({query: query, model: model}),
+                    body: JSON.stringify(body),
                 });
 
                 if(response.status === 401 || response.redirected) {

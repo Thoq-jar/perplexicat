@@ -12,13 +12,16 @@
 
     <div class="spaces-grid">
         {% for space in spaces %}
-            <div class="space-card">
+            <div class="space-card" style="position: relative;">
+                <button class="delete-space-card-btn" data-space-id="{{ space.id }}" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem; display: flex; align-items: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" title="Delete space">
+                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                </button>
                 <div class="space-icon">
                     <i data-lucide="layout-grid"></i>
                 </div>
                 <h3>{{ space.name }}</h3>
-                <p>{{ space.chats.count() }} threads</p>
-                <a href="#" class="view-space">View Space</a>
+                <p>{{ space.chats.count() }} thread{{ 's' if space.chats.count() != 1 else '' }}</p>
+                <a href="{{ url_for('main.space_view', space_id=space.id) }}" class="view-space">View Space</a>
             </div>
         {% endfor %}
         {% if not spaces %}
@@ -117,4 +120,49 @@
         color: var(--muted-color);
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        
+        const deleteButtons = document.querySelectorAll('.delete-space-card-btn');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const spaceId = btn.dataset.spaceId;
+                if (!spaceId) return;
+
+                if (!confirm('Are you sure you want to delete this space? All threads will be moved out of this space.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/delete_space/${spaceId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if(response.status === 401 || response.redirected) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
+                    if(!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `Server returned ${response.status}`);
+                    }
+
+                    location.reload();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to delete space');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

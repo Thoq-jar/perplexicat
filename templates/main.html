@@ -7,11 +7,14 @@
         <textarea id="search-input" class="search-input" placeholder="Ask anything. Type @ for mentions and / for shortcuts." autofocus></textarea>
         <div class="search-actions">
             <div class="action-group">
-                <select id="model-select" class="model-select">
-                    <option value="microsoft/phi-1_5" selected>Phi-1.5</option>
-                    <option value="gpt2">GPT-2</option>
-                    <option value="distilgpt2">DistilGPT-2</option>
+                {% if current_user.is_authenticated and spaces %}
+                <select id="space-select" class="model-select" style="margin-right: 0.5rem;">
+                    <option value="">No Space</option>
+                    {% for space in spaces %}
+                        <option value="{{ space.id }}">{{ space.name }}</option>
+                    {% endfor %}
                 </select>
+                {% endif %}
                 <button class="action-btn"><i data-lucide="plus"></i><span>Attach</span></button>
             </div>
             <div class="action-group">

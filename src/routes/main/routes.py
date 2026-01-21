@@ -35,6 +35,18 @@ def spaces_list():
     return render_template('spaces.html', chats=chats, spaces=spaces)
 
 
+@bp.route('/space/<int:space_id>')
+@login_required
+def space_view(space_id):
+    space = Space.query.get_or_404(space_id)
+    if space.user_id != current_user.id:
+        return redirect(url_for('main.index'))
+    chats = Chat.query.filter_by(space_id=space_id, user_id=current_user.id).order_by(Chat.created_at.desc()).all()
+    all_chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).limit(10).all()
+    spaces = Space.query.filter_by(user_id=current_user.id).all()
+    return render_template('space.html', space=space, chats=chats, all_chats=all_chats, spaces=spaces)
+
+
 @bp.route('/space/new', methods=['POST'])
 @login_required
 def create_space():
