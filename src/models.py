@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    theme = db.Column(db.String(20), default='system')
+    selected_model = db.Column(db.String(64), default='qwen3-vl:8b')
     chats = db.relationship('Chat', backref='author', lazy='dynamic')
     spaces = db.relationship('Space', backref='owner', lazy='dynamic')
 

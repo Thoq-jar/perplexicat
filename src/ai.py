@@ -294,7 +294,7 @@ class AIService:
     def generate_response(
         self,
         query,
-        model_name="gemma3:4b",
+        model_name="qwen3-vl:8b",
         chat_context=None,
         search_results=None,
         searxng_host=None,
@@ -337,12 +337,11 @@ class AIService:
     def generate_response_stream(
         self,
         query,
-        model_name="gemma3:4b",
+        model_name="qwen3-vl:8b",
         chat_context=None,
         search_results=None,
         searxng_host=None,
     ):
-        """Generate response with streaming support - yields chunks as they arrive"""
         system_prompt = """You are Perplexicat, a helpful AI assistant. You provide accurate, helpful, and concise responses. When search results are provided, prioritize using that information in your response. Use the chat context to maintain conversation continuity."""
 
         messages = []

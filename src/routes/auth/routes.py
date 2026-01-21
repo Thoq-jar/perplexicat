@@ -1,47 +1,62 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import jsonify, request
 from flask_login import login_user, logout_user, current_user
 from src.routes.auth import bp
 from src.models import User
-from src import db
+from src.db import db
 
 
-@bp.route('/login', methods=['GET', 'POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    if request.method == 'POST':
+        return jsonify({'success': True, 'message': 'Already logged in'})
+    
+    data = request.get_json() if request.is_json else None
+    if data:
+        username = data.get('username')
+        password = data.get('password')
+    else:
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user is None or not user.check_password(password):
-            flash('Invalid username or password')
-            return redirect(url_for('auth.login'))
-        login_user(user)
-        return redirect(url_for('main.index'))
-    return render_template('login.html')
+    
+    if not username or not password:
+        return jsonify({'success': False, 'message': 'Username and password required'}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    if user is None or not user.check_password(password):
+        return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
+    
+    login_user(user)
+    return jsonify({'success': True, 'message': 'Login successful'})
 
 
-@bp.route('/logout')
+@bp.route('/logout', methods=['POST'])
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return jsonify({'success': True, 'message': 'Logged out successfully'})
 
 
-@bp.route('/register', methods=['GET', 'POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    if request.method == 'POST':
+        return jsonify({'success': False, 'message': 'Already logged in'}), 400
+    
+    data = request.get_json() if request.is_json else None
+    if data:
+        username = data.get('username')
+        password = data.get('password')
+    else:
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user:
-            flash('Username already exists')
-            return redirect(url_for('auth.register'))
-        user = User(username=username)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('auth.login'))
-    return render_template('register.html')
+    
+    if not username or not password:
+        return jsonify({'success': False, 'message': 'Username and password required'}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    if user:
+        return jsonify({'success': False, 'message': 'Username already exists'}), 409
+    
+    user = User(username=username)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Registration successful'})

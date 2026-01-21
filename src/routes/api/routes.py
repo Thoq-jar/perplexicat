@@ -2,10 +2,7 @@ from flask import (
     Blueprint,
     request,
     jsonify,
-    redirect,
-    url_for,
     current_app,
-    render_template,
     Response,
     stream_with_context,
 )
@@ -25,7 +22,7 @@ def generate():
     query = data.get("query", "")
     chat_id = data.get("chat_id")
     space_id = data.get("space_id")
-    model_name = data.get("model", "gemma3:4b")
+    model_name = data.get("model", "qwen3-vl:8b")
     is_followup = data.get("is_followup", False)
     use_sse = data.get("use_sse", False)
 
@@ -115,15 +112,7 @@ def generate():
                 assistant_content += chunk
                 yield f"data: {json.dumps({'type': 'chunk', 'chunk': chunk})}\n\n"
 
-            if search_results and len(search_results) > 0:
-                search_results_html = render_template(
-                    "partials/search_results.html", search_results=search_results
-                )
-                full_content = search_results_html + assistant_content
-            else:
-                full_content = assistant_content
-
-            assistant_msg = Message(role="assistant", content=full_content, chat=chat)
+            assistant_msg = Message(role="assistant", content=assistant_content, chat=chat)
             db.session.add(assistant_msg)
             db.session.commit()
 
@@ -214,15 +203,7 @@ def generate():
                 search_results=search_results,
             )
 
-            if search_results and len(search_results) > 0:
-                search_results_html = render_template(
-                    "partials/search_results.html", search_results=search_results
-                )
-                full_content = search_results_html + assistant_content
-            else:
-                full_content = assistant_content
-
-            assistant_msg = Message(role="assistant", content=full_content, chat=chat)
+            assistant_msg = Message(role="assistant", content=assistant_content, chat=chat)
             db.session.add(assistant_msg)
             db.session.commit()
 
@@ -237,6 +218,178 @@ def generate():
             db.session.rollback()
             print(f"Error in generate: {e}")
             return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/user", methods=["GET"])
+@login_required
+def get_user():
+    return jsonify({
+        "id": current_user.id,
+        "username": current_user.username,
+        "theme": getattr(current_user, 'theme', 'system'),
+        "selected_model": getattr(current_user, 'selected_model', 'qwen3-vl:8b'),
+    })
+
+
+@bp.route("/chats", methods=["GET"])
+@login_required
+def get_chats():
+    chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).all()
+    return jsonify([{
+        "id": chat.id,
+        "title": chat.title,
+        "created_at": chat.created_at.isoformat() if chat.created_at else None,
+        "user_id": chat.user_id,
+        "space_id": chat.space_id
+    } for chat in chats])
+
+
+@bp.route("/chat/<int:chat_id>", methods=["GET"])
+@login_required
+def get_chat(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
+    if chat.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.created_at.asc()).all()
+    return jsonify({
+        "chat": {
+            "id": chat.id,
+            "title": chat.title,
+            "created_at": chat.created_at.isoformat() if chat.created_at else None,
+            "user_id": chat.user_id,
+            "space_id": chat.space_id
+        },
+        "messages": [{
+            "id": msg.id,
+            "content": msg.content,
+            "role": msg.role,
+            "chat_id": msg.chat_id,
+            "created_at": msg.created_at.isoformat() if msg.created_at else None
+        } for msg in messages]
+    })
+
+
+@bp.route("/spaces", methods=["GET"])
+@login_required
+def get_spaces():
+    spaces = Space.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{
+        "id": space.id,
+        "name": space.name,
+        "user_id": space.user_id,
+        "chats": [{"id": c.id} for c in Chat.query.filter_by(space_id=space.id).all()]
+    } for space in spaces])
+
+
+@bp.route("/space/<int:space_id>", methods=["GET"])
+@login_required
+def get_space(space_id):
+    space = Space.query.get_or_404(space_id)
+    if space.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    chats = Chat.query.filter_by(space_id=space_id).order_by(Chat.created_at.desc()).all()
+    return jsonify({
+        "space": {
+            "id": space.id,
+            "name": space.name,
+            "user_id": space.user_id
+        },
+        "chats": [{
+            "id": chat.id,
+            "title": chat.title,
+            "created_at": chat.created_at.isoformat() if chat.created_at else None,
+            "user_id": chat.user_id,
+            "space_id": chat.space_id
+        } for chat in chats]
+    })
+
+
+@bp.route("/create_space", methods=["POST"])
+@login_required
+def create_space():
+    data = request.get_json()
+    name = data.get("name", "").strip()
+    
+    if not name:
+        return jsonify({"error": "Space name is required"}), 400
+    
+    space = Space(name=name, user_id=current_user.id)
+    db.session.add(space)
+    db.session.commit()
+    
+    return jsonify({
+        "id": space.id,
+        "name": space.name,
+        "user_id": space.user_id
+    })
+
+
+@bp.route("/update_chat_title/<int:chat_id>", methods=["POST"])
+@login_required
+def update_chat_title(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
+    if chat.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    data = request.get_json()
+    title = data.get("title", "").strip()
+    
+    if title:
+        chat.title = title
+        db.session.commit()
+    
+    return jsonify({"success": True})
+
+
+@bp.route("/update_theme", methods=["POST"])
+@login_required
+def update_theme():
+    data = request.get_json()
+    theme = data.get("theme", "system")
+    
+    if hasattr(current_user, 'theme'):
+        current_user.theme = theme
+        db.session.commit()
+    
+    return jsonify({"success": True})
+
+
+@bp.route("/update_model", methods=["POST"])
+@login_required
+def update_model():
+    data = request.get_json()
+    model = data.get("model", "gemma:4b")
+    
+    if hasattr(current_user, 'selected_model'):
+        current_user.selected_model = model
+        db.session.commit()
+    
+    return jsonify({"success": True})
+
+
+@bp.route("/move_chat_to_space", methods=["POST"])
+@login_required
+def move_chat_to_space_api():
+    data = request.get_json()
+    chat_id = data.get("chat_id")
+    space_id = data.get("space_id")
+    
+    chat = Chat.query.get_or_404(chat_id)
+    if chat.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    if space_id is None:
+        chat.space_id = None
+    else:
+        space = Space.query.get(space_id)
+        if not space or space.user_id != current_user.id:
+            return jsonify({"error": "Invalid space"}), 400
+        chat.space_id = space_id
+    
+    db.session.commit()
+    return jsonify({"success": True})
 
 
 @bp.route("/delete_chat/<int:chat_id>", methods=["DELETE"])

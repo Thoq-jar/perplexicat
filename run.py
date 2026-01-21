@@ -6,7 +6,7 @@ from os import path
 
 
 def create_app() -> Flask:
-    app: Flask = Flask(__name__, instance_path=path.join(path.dirname(__file__), 'instance'), template_folder='./templates', static_folder='./static')
+    app: Flask = Flask(__name__, instance_path=path.join(path.dirname(__file__), 'instance'), static_folder='./static/dist')
     app.config.from_object(Config)
     Config.init_app(app)
 
@@ -20,7 +20,7 @@ def create_app() -> Flask:
 
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     with app.app_context():
         from src.models import User, Chat, Space, Message, Attachment
@@ -36,4 +36,4 @@ def create_app() -> Flask:
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

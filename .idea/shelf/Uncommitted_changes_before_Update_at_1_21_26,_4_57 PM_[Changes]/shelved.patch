@@ -1,0 +1,183 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"CMakeProjectFlavorService\">\n    <option name=\"flavorId\" value=\"CMakePlainProjectFlavor\" />\n  </component>\n  <component name=\"CMakeSettings\">\n    <configurations>\n      <configuration PROFILE_NAME=\"Debug\" ENABLED=\"true\" CONFIG_NAME=\"Debug\" />\n    </configurations>\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"4f14c825-f913-4b76-8983-1918a44ee967\" name=\"Changes\" comment=\"init\">\n      <change afterPath=\"$PROJECT_DIR$/.gitignore\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/instance/perplexicat.db\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/ai.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/db.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/login_manager.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/models.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/routes/auth/__init__.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/routes/auth/routes.py\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/static/js/client.js\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/static/vendor/lucide.min.js\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/chat.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/login.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/main.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/register.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/settings.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/sidebar.html\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/templates/spaces.html\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/.gitignore\" beforeDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/modules.xml\" beforeDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/perplexiat.iml\" beforeDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/requirements.txt\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/requirements.txt\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/run.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/run.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/config.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/config.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/routes/api/routes.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/routes/api/routes.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/routes/main/routes.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/routes/main/routes.py\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/static/css/styles.css\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/static/css/styles.css\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/templates/base.html\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/templates/base.html\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/templates/head.html\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/templates/head.html\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"EmbeddingIndexingInfo\">\n    <option name=\"fileBasedEmbeddingIndicesEnabled\" value=\"true\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;Thoq-jar&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;git@github.com:Thoq-jar/perplexicat.git&quot;,\n    &quot;accountId&quot;: &quot;83b55425-07a3-4c25-935a-1dffa6267ba8&quot;\n  }\n}</component>\n  <component name=\"MacroExpansionManager\">\n    <option name=\"directoryName\" value=\"3fF6bKXd\" />\n  </component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 6\n}</component>\n  <component name=\"ProjectId\" id=\"38WtMOUDc9dptTLZeXqPoGFi2BP\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ASKED_SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.MCP Project settings loaded\": \"true\",\n    \"RunOnceActivity.RadMigrateCodeStyle\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\n    \"RunOnceActivity.cidr.known.project.marker\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"RunOnceActivity.go.formatter.settings.were.checked\": \"true\",\n    \"RunOnceActivity.readMode.enableVisualFormatting\": \"true\",\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"cidr.known.project.marker\": \"true\",\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\n    \"git-widget-placeholder\": \"main\",\n    \"junie.onboarding.icon.badge.shown\": \"true\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"last_opened_file_path\": \"/Users/tristanshaw/Projects/perplexiat/src/routes/main\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"project.structure.last.edited\": \"Project\",\n    \"project.structure.proportion\": \"0.0\",\n    \"project.structure.side.proportion\": \"0.0\",\n    \"to.speed.mode.migration.done\": \"true\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/src/routes/main\" />\n    </key>\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/src\" />\n      <recent name=\"$PROJECT_DIR$/src/routes/main\" />\n      <recent name=\"$PROJECT_DIR$/src/routes\" />\n    </key>\n  </component>\n  <component name=\"RunManager\">\n    <configuration default=\"true\" type=\"CMakeRunConfiguration\" factoryName=\"Application\" REDIRECT_INPUT=\"false\" ELEVATE=\"false\" USE_EXTERNAL_CONSOLE=\"false\" EMULATE_TERMINAL=\"false\" PASS_PARENT_ENVS_2=\"true\">\n      <method v=\"2\">\n        <option name=\"com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask\" enabled=\"true\" />\n      </method>\n    </configuration>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240\" />\n        <option value=\"bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"4f14c825-f913-4b76-8983-1918a44ee967\" name=\"Changes\" comment=\"\" />\n      <created>1768927108939</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1768927108939</updated>\n      <workItem from=\"1768927111116\" duration=\"875000\" />\n      <workItem from=\"1768928057075\" duration=\"38000\" />\n      <workItem from=\"1768928096997\" duration=\"7000\" />\n      <workItem from=\"1768931486405\" duration=\"1502000\" />\n      <workItem from=\"1769003108069\" duration=\"3657000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"init\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1768927987669</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1768927987669</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"2\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"init\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"init\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision b3e6debdc8e1546a64e2a47dc7dec085ae69eb0c)
++++ b/.idea/workspace.xml	(date 1769024138171)
+@@ -12,37 +12,8 @@
+     </configurations>
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="4f14c825-f913-4b76-8983-1918a44ee967" name="Changes" comment="init">
+-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/instance/perplexicat.db" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/ai.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/db.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/login_manager.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/models.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/routes/auth/__init__.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/routes/auth/routes.py" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/static/js/client.js" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/static/vendor/lucide.min.js" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/chat.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/main.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/settings.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/sidebar.html" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/templates/spaces.html" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/perplexiat.iml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/routes/api/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/routes.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/routes/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/main/routes.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/styles.css" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/templates/head.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/head.html" afterDir="false" />
++    <list default="true" id="4f14c825-f913-4b76-8983-1918a44ee967" name="Changes" comment="stuff">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -60,6 +31,11 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="main" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="GitHubPullRequestSearchHistory">{
+@@ -89,38 +65,38 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "ModuleVcsDetector.initialDetectionPerformed": "true",
+-    "RunOnceActivity.MCP Project settings loaded": "true",
+-    "RunOnceActivity.RadMigrateCodeStyle": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+-    "RunOnceActivity.cidr.known.project.marker": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "cidr.known.project.marker": "true",
+-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-    "git-widget-placeholder": "main",
+-    "junie.onboarding.icon.badge.shown": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "/Users/tristanshaw/Projects/perplexiat/src/routes/main",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Project",
+-    "project.structure.proportion": "0.0",
+-    "project.structure.side.proportion": "0.0",
+-    "to.speed.mode.migration.done": "true",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
++    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
++    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;/Users/tristanshaw/Projects/perplexiat/src/routes/main&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
++    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CopyFile.RECENT_KEYS">
+       <recent name="$PROJECT_DIR$/src/routes/main" />
+@@ -130,13 +106,6 @@
+       <recent name="$PROJECT_DIR$/src/routes/main" />
+       <recent name="$PROJECT_DIR$/src/routes" />
+     </key>
+-  </component>
+-  <component name="RunManager">
+-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+-      <method v="2">
+-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+-      </method>
+-    </configuration>
+   </component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+@@ -157,7 +126,8 @@
+       <workItem from="1768928057075" duration="38000" />
+       <workItem from="1768928096997" duration="7000" />
+       <workItem from="1768931486405" duration="1502000" />
+-      <workItem from="1769003108069" duration="3657000" />
++      <workItem from="1769003108069" duration="5210000" />
++      <workItem from="1769024086373" duration="52000" />
+     </task>
+     <task id="LOCAL-00001" summary="init">
+       <option name="closed" value="true" />
+@@ -167,7 +137,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1768927987669</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="stuff">
++      <option name="closed" value="true" />
++      <created>1769007052879</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1769007052879</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -175,6 +153,7 @@
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="init" />
+-    <option name="LAST_COMMIT_MESSAGE" value="init" />
++    <MESSAGE value="stuff" />
++    <option name="LAST_COMMIT_MESSAGE" value="stuff" />
+   </component>
+ </project>
+\ No newline at end of file
