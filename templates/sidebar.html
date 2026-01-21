@@ -1,0 +1,85 @@
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-logo">
+            <a href="{{ url_for('main.index') }}" style="color: inherit; text-decoration: none;">
+                <i data-lucide="snowflake"></i>
+            </a>
+        </div>
+        <a href="{{ url_for('main.index') }}" class="sidebar-btn new-chat">
+            <i data-lucide="plus"></i>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('main.index') }}" class="sidebar-item active">
+            <i data-lucide="search"></i>
+            <span>Home</span>
+        </a>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-header">
+                <i data-lucide="layout-grid"></i>
+                <a href="{{ url_for('main.spaces_list') }}" style="color: inherit; text-decoration: none;"><span>Spaces</span></a>
+            </div>
+            <div class="sidebar-section-content">
+                {% if current_user.is_authenticated %}
+                    {% for space in spaces %}
+                        <a href="#" class="sidebar-subitem">
+                            <span>{{ space.name }}</span>
+                        </a>
+                    {% endfor %}
+                    <a href="{{ url_for('main.spaces_list') }}" class="sidebar-subitem add-space">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                        <span>Create Space</span>
+                    </a>
+                {% else %}
+                    <div class="sidebar-subitem muted">Login to see spaces</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-header">
+                <i data-lucide="history"></i>
+                <span>Library</span>
+            </div>
+            <div class="sidebar-section-content">
+                {% if current_user.is_authenticated %}
+                    {% for chat in chats %}
+                        <a href="{{ url_for('main.chat_view', chat_id=chat.id) }}" class="sidebar-subitem">
+                            <span>{{ chat.title or 'New Chat' }}</span>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="sidebar-subitem muted">Login to see history</div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.settings') }}" class="sidebar-item profile">
+                <div class="avatar">{{ current_user.username[0].upper() }}</div>
+                <span>{{ current_user.username }}</span>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="sidebar-item">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="sidebar-item">
+                <i data-lucide="log-in"></i>
+                <span>Login</span>
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="sidebar-item">
+                <i data-lucide="user-plus"></i>
+                <span>Sign Up</span>
+            </a>
+        {% endif %}
+        <a href="{{ url_for('main.settings') }}" class="sidebar-item more-btn">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</aside>

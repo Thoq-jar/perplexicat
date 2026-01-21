@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="settings-container">
+        <h1>Settings</h1>
+        
+        <div class="settings-section">
+            <h3>Profile</h3>
+            <div class="settings-item">
+                <div class="settings-label">Username</div>
+                <div class="settings-value">{{ current_user.username }}</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Appearance</h3>
+            <div class="settings-item">
+                <div class="settings-label">Theme</div>
+                <div class="settings-value">Dark (Default)</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Account</h3>
+            <button class="auth-btn" style="background-color: transparent; border: 1px solid #ff4444; color: #ff4444; width: auto; padding: 0.5rem 1rem;">Delete Account</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .settings-container {
+        width: 100%;
+        max-width: 600px;
+        text-align: left;
+    }
+    .settings-section {
+        margin-top: 2.5rem;
+    }
+    .settings-section h3 {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .settings-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+    }
+    .settings-label {
+        color: var(--muted-color);
+    }
+    .settings-value {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

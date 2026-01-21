@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-messages">
+        {% for message in chat.messages %}
+            <div class="message {{ message.role }}">
+                <div class="message-header">
+                    {% if message.role == 'user' %}
+                        <div class="avatar">{{ current_user.username[0].upper() }}</div>
+                        <span>{{ current_user.username }}</span>
+                    {% else %}
+                        <div class="avatar ai"><i data-lucide="snowflake" style="width: 14px; height: 14px;"></i></div>
+                        <span>Perplexicat</span>
+                    {% endif %}
+                </div>
+                <div class="message-content">
+                    {{ message.content }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input-wrapper">
+        <div class="search-container chat-search" data-chat-id="{{ chat.id }}">
+            <textarea id="search-input" class="search-input" placeholder="Ask follow-up..." autofocus></textarea>
+            <div class="search-actions">
+                <div class="action-group">
+                    <select id="model-select" class="model-select">
+                        <option value="microsoft/phi-1_5" selected>Phi-1.5</option>
+                        <option value="gpt2">GPT-2</option>
+                        <option value="distilgpt2">DistilGPT-2</option>
+                    </select>
+                    <button class="action-btn"><i data-lucide="plus"></i><span>Attach</span></button>
+                </div>
+                <div class="action-group">
+                    <button id="submit-btn" class="submit-btn"><i data-lucide="audio-lines"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle follow-up questions
+    document.addEventListener('DOMContentLoaded', () => {
+        const textarea = document.getElementById('search-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const chatSearch = document.querySelector('.chat-search');
+        const chatId = chatSearch ? chatSearch.dataset.chatId : null;
+
+        if (textarea && submitBtn) {
+            textarea.addEventListener('input', () => {
+                if (textarea.value.trim() !== '') {
+                    submitBtn.innerHTML = '<i data-lucide="arrow-up"></i>';
+                } else {
+                    submitBtn.innerHTML = '<i data-lucide="audio-lines"></i>';
+                }
+                lucide.createIcons();
+            });
+
+            const handleSubmit = async () => {
+                const query = textarea.value.trim();
+                if (!query) return;
+
+                const modelSelect = document.getElementById('model-select');
+                const model = modelSelect ? modelSelect.value : 'microsoft/phi-1_5';
+
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query: query, chat_id: chatId, model: model }),
+                    });
+
+                    if(response.status === 401 || response.redirected) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
+                    if(!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `Server returned ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.response) {
+                        location.reload(); // Simple reload to show new messages
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
+            };
+
+            submitBtn.addEventListener('click', handleSubmit);
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

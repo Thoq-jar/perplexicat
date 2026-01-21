@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="spaces-header">
+        <h1>Spaces</h1>
+        <button class="action-btn active" onclick="document.getElementById('new-space-modal').style.display='flex'">
+            <i data-lucide="plus"></i>
+            <span>Create Space</span>
+        </button>
+    </div>
+
+    <div class="spaces-grid">
+        {% for space in spaces %}
+            <div class="space-card">
+                <div class="space-icon">
+                    <i data-lucide="layout-grid"></i>
+                </div>
+                <h3>{{ space.name }}</h3>
+                <p>{{ space.chats.count() }} threads</p>
+                <a href="#" class="view-space">View Space</a>
+            </div>
+        {% endfor %}
+        {% if not spaces %}
+            <div class="empty-state">
+                <i data-lucide="layout-grid" style="width: 48px; height: 48px; opacity: 0.2;"></i>
+                <p>No spaces yet. Create one to organize your threads.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="new-space-modal" class="modal">
+    <div class="modal-content auth-container">
+        <h2>Create a new Space</h2>
+        <form action="{{ url_for('main.create_space') }}" method="POST">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Space Name" required autofocus>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="button" class="auth-btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="document.getElementById('new-space-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="auth-btn">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .spaces-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 800px;
+        margin-bottom: 2rem;
+    }
+    .spaces-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 800px;
+    }
+    .space-card {
+        background-color: var(--secondary-background-color);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: left;
+        transition: border-color 0.2s;
+    }
+    .space-card:hover {
+        border-color: var(--accent-color);
+    }
+    .space-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: var(--background-color);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: var(--accent-color);
+    }
+    .space-card h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+    }
+    .space-card p {
+        margin: 0 0 1rem 0;
+        color: var(--muted-color);
+        font-size: 0.9rem;
+    }
+    .view-space {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .empty-state {
+        grid-column: 1 / -1;
+        padding: 4rem;
+        text-align: center;
+        color: var(--muted-color);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">perplexicat</h1>
+    <div class="search-container">
+        <textarea id="search-input" class="search-input" placeholder="Ask anything. Type @ for mentions and / for shortcuts." autofocus></textarea>
+        <div class="search-actions">
+            <div class="action-group">
+                <select id="model-select" class="model-select">
+                    <option value="microsoft/phi-1_5" selected>Phi-1.5</option>
+                    <option value="gpt2">GPT-2</option>
+                    <option value="distilgpt2">DistilGPT-2</option>
+                </select>
+                <button class="action-btn"><i data-lucide="plus"></i><span>Attach</span></button>
+            </div>
+            <div class="action-group">
+                <button id="submit-btn" class="submit-btn"><i data-lucide="audio-lines"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

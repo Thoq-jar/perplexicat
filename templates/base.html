@@ -1,9 +1,12 @@
 <!doctype html>
 <html lang="en">
-{% include 'head.jinja2' %}
+{% include 'head.html' %}
 <body>
-<div class="container">
-    {% include 'header.jinja2' %}
-</div>
+    <div class="layout">
+        {% include 'sidebar.html' %}
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>
