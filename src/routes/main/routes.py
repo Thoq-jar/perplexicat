@@ -24,7 +24,8 @@ def chat_view(chat_id):
         return redirect(url_for('main.index'))
     chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).limit(10).all()
     spaces = Space.query.filter_by(user_id=current_user.id).all()
-    return render_template('chat.html', chat=chat, chats=chats, spaces=spaces)
+    query_param = request.args.get('q') or request.args.get('query')
+    return render_template('chat.html', chat=chat, chats=chats, spaces=spaces, query_param=query_param)
 
 
 @bp.route('/spaces')
@@ -56,6 +57,14 @@ def create_space():
         db.session.add(space)
         db.session.commit()
     return redirect(url_for('main.spaces_list'))
+
+
+@bp.route('/library')
+@login_required
+def library():
+    chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).all()
+    spaces = Space.query.filter_by(user_id=current_user.id).all()
+    return render_template('library.html', chats=chats, spaces=spaces)
 
 
 @bp.route('/settings')

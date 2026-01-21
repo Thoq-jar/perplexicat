@@ -1,26 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1 class="title">perplexicat</h1>
-    <div class="search-container">
-        <textarea id="search-input" class="search-input" placeholder="Ask anything. Type @ for mentions and / for shortcuts." autofocus></textarea>
-        <div class="search-actions">
-            <div class="action-group">
-                {% if current_user.is_authenticated and spaces %}
-                <select id="space-select" class="model-select" style="margin-right: 0.5rem;">
-                    <option value="">No Space</option>
-                    {% for space in spaces %}
-                        <option value="{{ space.id }}">{{ space.name }}</option>
-                    {% endfor %}
-                </select>
-                {% endif %}
-                <button class="action-btn"><i data-lucide="plus"></i><span>Attach</span></button>
-            </div>
-            <div class="action-group">
-                <button id="submit-btn" class="submit-btn"><i data-lucide="audio-lines"></i></button>
-            </div>
-        </div>
+<div class="container" {% if current_user.is_authenticated %}data-username="{{ current_user.username|e }}"{% endif %}>
+    <h1 id="main-title" class="title">perplexicat</h1>
+    <div id="messages-container" class="messages-container">
+        <div id="main-messages" class="main-messages"></div>
     </div>
+    {% include 'partials/input_component.html' %}
 </div>
 {% endblock %}

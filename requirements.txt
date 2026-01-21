@@ -4,3 +4,5 @@ Flask-SQLAlchemy
 Flask-Login
 Werkzeug
 requests
+beautifulsoup4
+ollama

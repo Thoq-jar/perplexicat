@@ -1,59 +1,207 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="settings-container">
+<div class="page-container">
+    <div class="page-header">
         <h1>Settings</h1>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>Profile</h2>
+            <div class="settings-card">
+                <div class="settings-item">
+                    <div class="settings-item-label">
+                        <label>Username</label>
+                        <span class="settings-hint">Your display name</span>
+                    </div>
+                    <div class="settings-item-control">
+                        <input type="text" id="username-input" class="input-component settings-input" value="{{ current_user.username }}">
+                        <button class="action-btn" id="save-username-btn">
+                            <i data-lucide="check"></i>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div class="settings-section">
-            <h3>Profile</h3>
+            <h2>Security</h2>
+            <div class="settings-card">
             <div class="settings-item">
-                <div class="settings-label">Username</div>
-                <div class="settings-value">{{ current_user.username }}</div>
+                    <div class="settings-item-label">
+                        <label>Change Password</label>
+                        <span class="settings-hint">Update your account password</span>
+                    </div>
+                    <div class="settings-item-control">
+                        <div class="settings-input-group">
+                            <input type="password" id="new-password-input" class="input-component settings-input" placeholder="New password">
+                            <input type="password" id="confirm-password-input" class="input-component settings-input" placeholder="Confirm password">
+                        </div>
+                        <button class="action-btn" id="save-password-btn">
+                            <i data-lucide="lock"></i>
+                            <span>Update</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="settings-section">
-            <h3>Appearance</h3>
+            <h2>Appearance</h2>
+            <div class="settings-card">
             <div class="settings-item">
-                <div class="settings-label">Theme</div>
+                    <div class="settings-item-label">
+                        <label>Theme</label>
+                        <span class="settings-hint">Current theme setting</span>
+                    </div>
+                    <div class="settings-item-control">
                 <div class="settings-value">Dark (Default)</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="settings-section">
-            <h3>Account</h3>
-            <button class="auth-btn" style="background-color: transparent; border: 1px solid #ff4444; color: #ff4444; width: auto; padding: 0.5rem 1rem;">Delete Account</button>
+            <h2>Danger Zone</h2>
+            <div class="settings-card danger">
+                <div class="settings-item">
+                    <div class="settings-item-label">
+                        <label>Delete Account</label>
+                        <span class="settings-hint">Permanently delete your account and all data</span>
+                    </div>
+                    <div class="settings-item-control">
+                        <button class="action-btn danger" id="delete-account-btn">
+                            <i data-lucide="trash-2"></i>
+                            <span>Delete Account</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    .settings-container {
-        width: 100%;
-        max-width: 600px;
-        text-align: left;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    
+    const saveUsernameBtn = document.getElementById('save-username-btn');
+    const usernameInput = document.getElementById('username-input');
+    
+    saveUsernameBtn?.addEventListener('click', async () => {
+        const newUsername = usernameInput.value.trim();
+        if (!newUsername) {
+            alert('Username cannot be empty');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/update_username', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: newUsername }),
+            });
+            
+            if (response.status === 401 || response.redirected) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to update username');
     }
-    .settings-section {
-        margin-top: 2.5rem;
+            
+            alert('Username updated successfully');
+            location.reload();
+        } catch (error) {
+            alert(error.message || 'Failed to update username');
+        }
+    });
+    
+    const savePasswordBtn = document.getElementById('save-password-btn');
+    const newPasswordInput = document.getElementById('new-password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+    
+    savePasswordBtn?.addEventListener('click', async () => {
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (!newPassword || !confirmPassword) {
+            alert('Please fill in both password fields');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            alert('Password must be at least 6 characters');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/update_password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: newPassword }),
+            });
+            
+            if (response.status === 401 || response.redirected) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to update password');
+            }
+            
+            alert('Password updated successfully');
+            newPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+        } catch (error) {
+            alert(error.message || 'Failed to update password');
     }
-    .settings-section h3 {
-        font-size: 1.2rem;
-        font-weight: 500;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--border-color);
+    });
+    
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    deleteAccountBtn?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to delete your account? This action cannot be undone and will delete all your chats and spaces.')) {
+            return;
+        }
+        
+        const confirmText = prompt('Type "DELETE" to confirm account deletion:');
+        if (confirmText !== 'DELETE') {
+            return;
     }
-    .settings-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 1rem 0;
+        
+        try {
+            const response = await fetch('/api/delete_account', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            
+            if (response.status === 401 || response.redirected) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to delete account');
     }
-    .settings-label {
-        color: var(--muted-color);
-    }
-    .settings-value {
-        font-weight: 500;
-    }
-</style>
+            
+            alert('Account deleted successfully');
+            window.location.href = '/';
+        } catch (error) {
+            alert(error.message || 'Failed to delete account');
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -2,11 +2,13 @@ from flask import Flask
 from src.db import db
 from src.config import Config
 from src.login_manager import login_manager
+from os import path
 
 
 def create_app() -> Flask:
-    app: Flask = Flask(__name__, template_folder='./templates', static_folder='./static')
+    app: Flask = Flask(__name__, instance_path=path.join(path.dirname(__file__), 'instance'), template_folder='./templates', static_folder='./static')
     app.config.from_object(Config)
+    Config.init_app(app)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -21,8 +23,13 @@ def create_app() -> Flask:
     app.register_blueprint(auth_bp)
 
     with app.app_context():
-        from src.models import User, Chat, Space
+        from src.models import User, Chat, Space, Message, Attachment
         db.create_all()
+        
+        import os
+        upload_dir = app.config.get('UPLOAD_FOLDER')
+        if upload_dir and not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
 
     return app
 

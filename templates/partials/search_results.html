@@ -1,0 +1,24 @@
+{% if search_results %}
+<div class="search-results-container">
+    {% for result in search_results[:5] %}
+        {% if result and result.url %}
+        <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer" class="search-result-item">
+            <div class="search-result-item-inner">
+                {% if result.favicon %}
+                <img src="{{ result.favicon }}" onerror="this.style.display='none'" class="search-result-favicon" />
+                {% else %}
+                <i data-lucide="globe" class="search-result-favicon-icon"></i>
+                {% endif %}
+                <div class="search-result-content">
+                    <div class="search-result-title">{{ result.title or 'Untitled' }}</div>
+                    {% if result.content %}
+                    <div class="search-result-snippet">{{ result.content[:150] }}</div>
+                    {% endif %}
+                </div>
+                <i data-lucide="external-link" class="search-result-external-link"></i>
+            </div>
+        </a>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}

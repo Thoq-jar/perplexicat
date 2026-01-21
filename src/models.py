@@ -47,3 +47,14 @@ class Message(db.Model):
     content = db.Column(db.Text)
     chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    attachments = db.relationship('Attachment', backref='message', lazy='dynamic', cascade='all, delete-orphan')
+
+
+class Attachment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey('message.id'))
+    filename = db.Column(db.String(255))
+    file_path = db.Column(db.String(500))
+    file_size = db.Column(db.Integer)
+    mime_type = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)

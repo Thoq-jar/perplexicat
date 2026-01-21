@@ -1,32 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="spaces-header">
+<div class="page-container">
+    <div class="page-header">
         <h1>Spaces</h1>
-        <button class="action-btn active" onclick="document.getElementById('new-space-modal').style.display='flex'">
+        <button class="action-btn" onclick="document.getElementById('new-space-modal').style.display='flex'">
             <i data-lucide="plus"></i>
             <span>Create Space</span>
         </button>
     </div>
 
-    <div class="spaces-grid">
+    <div class="card-grid">
         {% for space in spaces %}
-            <div class="space-card" style="position: relative;">
-                <button class="delete-space-card-btn" data-space-id="{{ space.id }}" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem; display: flex; align-items: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" title="Delete space">
-                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+        <a href="{{ url_for('main.space_view', space_id=space.id) }}" class="card">
+            <button class="card-delete-btn" data-space-id="{{ space.id }}" title="Delete space">
+                <i data-lucide="trash-2"></i>
                 </button>
-                <div class="space-icon">
+            <div class="card-icon">
                     <i data-lucide="layout-grid"></i>
                 </div>
+            <div class="card-content">
                 <h3>{{ space.name }}</h3>
                 <p>{{ space.chats.count() }} thread{{ 's' if space.chats.count() != 1 else '' }}</p>
-                <a href="{{ url_for('main.space_view', space_id=space.id) }}" class="view-space">View Space</a>
             </div>
+        </a>
         {% endfor %}
         {% if not spaces %}
             <div class="empty-state">
-                <i data-lucide="layout-grid" style="width: 48px; height: 48px; opacity: 0.2;"></i>
+            <i data-lucide="layout-grid"></i>
                 <p>No spaces yet. Create one to organize your threads.</p>
             </div>
         {% endif %}
@@ -38,127 +39,36 @@
         <h2>Create a new Space</h2>
         <form action="{{ url_for('main.create_space') }}" method="POST">
             <div class="form-group">
-                <input type="text" name="name" placeholder="Space Name" required autofocus>
+                <input type="text" name="name" class="input-component" placeholder="Space Name" required autofocus>
             </div>
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="button" class="auth-btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="document.getElementById('new-space-modal').style.display='none'">Cancel</button>
+            <div class="modal-form-actions">
+                <button type="button" class="auth-btn auth-btn-secondary" onclick="document.getElementById('new-space-modal').style.display='none'">Cancel</button>
                 <button type="submit" class="auth-btn">Create</button>
             </div>
         </form>
     </div>
 </div>
 
-<style>
-    .spaces-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        max-width: 800px;
-        margin-bottom: 2rem;
-    }
-    .spaces-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 1.5rem;
-        width: 100%;
-        max-width: 800px;
-    }
-    .space-card {
-        background-color: var(--secondary-background-color);
-        border: 1px solid var(--border-color);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: left;
-        transition: border-color 0.2s;
-    }
-    .space-card:hover {
-        border-color: var(--accent-color);
-    }
-    .space-icon {
-        width: 2.5rem;
-        height: 2.5rem;
-        background-color: var(--background-color);
-        border-radius: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-        color: var(--accent-color);
-    }
-    .space-card h3 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.1rem;
-    }
-    .space-card p {
-        margin: 0 0 1rem 0;
-        color: var(--muted-color);
-        font-size: 0.9rem;
-    }
-    .view-space {
-        color: var(--accent-color);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.7);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    .empty-state {
-        grid-column: 1 / -1;
-        padding: 4rem;
-        text-align: center;
-        color: var(--muted-color);
-    }
-</style>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         
-        const deleteButtons = document.querySelectorAll('.delete-space-card-btn');
-        deleteButtons.forEach(btn => {
+    document.querySelectorAll('.card-delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 const spaceId = btn.dataset.spaceId;
-                if (!spaceId) return;
-
-                if (!confirm('Are you sure you want to delete this space? All threads will be moved out of this space.')) {
-                    return;
-                }
+            if (!spaceId || !confirm('Delete this space? Threads will be moved out.')) return;
 
                 try {
                     const response = await fetch(`/api/delete_space/${spaceId}`, {
                         method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                    headers: { 'Content-Type': 'application/json' },
                     });
-
-                    if(response.status === 401 || response.redirected) {
-                        window.location.href = '/login';
-                        return;
-                    }
-
-                    if(!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.error || `Server returned ${response.status}`);
-                    }
-
+                if (!response.ok) throw new Error('Failed');
                     location.reload();
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('Failed to delete space');
                 }
             });

@@ -1,133 +1,35 @@
 <aside class="sidebar">
     <div class="sidebar-top">
-        <div class="sidebar-logo">
-            <a href="{{ url_for('main.index') }}" style="color: inherit; text-decoration: none;">
+        <a href="{{ url_for('main.index') }}" class="sidebar-logo">
                 <i data-lucide="snowflake"></i>
             </a>
-        </div>
         <a href="{{ url_for('main.index') }}" class="sidebar-btn new-chat">
             <i data-lucide="plus"></i>
         </a>
     </div>
 
     <nav class="sidebar-nav">
-        <a href="{{ url_for('main.index') }}" class="sidebar-item active">
-            <i data-lucide="search"></i>
-            <span>Home</span>
+        <a href="{{ url_for('main.library') }}" class="sidebar-item">
+            <i data-lucide="history"></i>
+            <span>History</span>
         </a>
-        
-        <div class="sidebar-section">
-            <div class="sidebar-section-header">
+        <a href="{{ url_for('main.spaces_list') }}" class="sidebar-item">
                 <i data-lucide="layout-grid"></i>
-                <a href="{{ url_for('main.spaces_list') }}" style="color: inherit; text-decoration: none;"><span>Spaces</span></a>
-            </div>
-            <div class="sidebar-section-content">
-                {% if current_user.is_authenticated %}
-                    {% for space in spaces %}
-                        <a href="{{ url_for('main.space_view', space_id=space.id) }}" class="sidebar-subitem">
-                            <span>{{ space.name }}</span>
-                        </a>
-                    {% endfor %}
-                    <a href="{{ url_for('main.spaces_list') }}" class="sidebar-subitem add-space">
-                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
-                        <span>Create Space</span>
-                    </a>
-                {% else %}
-                    <div class="sidebar-subitem muted">Login to see spaces</div>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-section-header">
-                <i data-lucide="history"></i>
-                <span>Library</span>
-            </div>
-            <div class="sidebar-section-content">
-                {% if current_user.is_authenticated %}
-                    {% for chat in chats %}
-                        <div class="sidebar-subitem" style="display: flex; justify-content: space-between; align-items: center;">
-                            <a href="{{ url_for('main.chat_view', chat_id=chat.id) }}" style="flex: 1; color: inherit; text-decoration: none;">
-                                <span>{{ chat.title or 'New Chat' }}</span>
-                            </a>
-                            <button class="delete-chat-sidebar-btn" data-chat-id="{{ chat.id }}" style="background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem; display: flex; align-items: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
-                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                            </button>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="sidebar-subitem muted">Login to see history</div>
-                {% endif %}
-            </div>
-        </div>
+            <span>Spaces</span>
+        </a>
     </nav>
 
     <div class="sidebar-bottom">
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.settings') }}" class="sidebar-item profile">
-                <div class="avatar">{{ current_user.username[0].upper() }}</div>
-                <span>{{ current_user.username }}</span>
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="sidebar-item">
-                <i data-lucide="log-out"></i>
-                <span>Logout</span>
+            <a href="{{ url_for('main.settings') }}" class="sidebar-item">
+                <i data-lucide="user"></i>
+                <span>{{ current_user.username[:6] }}</span>
             </a>
         {% else %}
             <a href="{{ url_for('auth.login') }}" class="sidebar-item">
                 <i data-lucide="log-in"></i>
                 <span>Login</span>
             </a>
-            <a href="{{ url_for('auth.register') }}" class="sidebar-item">
-                <i data-lucide="user-plus"></i>
-                <span>Sign Up</span>
-            </a>
         {% endif %}
-        <a href="{{ url_for('main.settings') }}" class="sidebar-item more-btn">
-            <i data-lucide="settings"></i>
-            <span>Settings</span>
-        </a>
     </div>
 </aside>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const deleteButtons = document.querySelectorAll('.delete-chat-sidebar-btn');
-        deleteButtons.forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const chatId = btn.dataset.chatId;
-                if (!chatId) return;
-
-                if (!confirm('Are you sure you want to delete this chat?')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/api/delete_chat/${chatId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-
-                    if(response.status === 401 || response.redirected) {
-                        window.location.href = '/login';
-                        return;
-                    }
-
-                    if(!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.error || `Server returned ${response.status}`);
-                    }
-
-                    location.reload();
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Failed to delete chat');
-                }
-            });
-        });
-    });
-</script>
