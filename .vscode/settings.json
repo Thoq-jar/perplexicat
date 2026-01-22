@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "beautifulsoup",
+        "dotenv",
+        "perplexicat",
+        "sqlalchemy",
+        "werkzeug"
+    ],
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "python.languageServer": "astral-sh.ty"
+}
