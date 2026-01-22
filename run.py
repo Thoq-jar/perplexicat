@@ -1,26 +1,39 @@
 from flask import Flask
-import os
+from src.db import db
+from src.config import Config
+from src.login_manager import login_manager
+from os import path
 
 
 def create_app() -> Flask:
-    app: Flask = Flask(__name__, template_folder='templates')
+    app: Flask = Flask(__name__, instance_path=path.join(path.dirname(__file__), 'instance'), static_folder='./static/dist')
+    app.config.from_object(Config)
+    Config.init_app(app)
 
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        print("warn: could not create instance folder!")
-        pass
+    db.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
 
-    from src.routes.main.routes import bp as main_bp
-    from src.routes.api.routes import bp as api_bp
+    from src.routes.main.routes import main_blueprint
+    from src.routes.api.routes import api_blueprint
+    from src.routes.auth import auth_blueprint
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp)
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(api_blueprint, url_prefix='/api')
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+    with app.app_context():
+        from src.models import User, Chat, Space, Message, Attachment
+        db.create_all()
+        
+        import os
+        upload_dir = app.config.get('UPLOAD_FOLDER')
+        if upload_dir and not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
 
     return app
 
 
-app = create_app()
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app = create_app()
+    app.run(debug=True, port=5001)

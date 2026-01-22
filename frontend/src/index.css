@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  --text-color: lab(93 0 2);
+  --muted-color: lab(51 -1 0);
+  --accent-color: lab(55 30 -40);
+  --border-color: lab(20 -2 0);
+  --bg-color: lab(7 0 0);
+  --bg-secondary: lab(10 -1 0);
+  --bg-tertiary: lab(14 -1 0);
+  --user-bg: lab(14 -1 0);
+  --user-text: lab(93 0 2);
+  --input-bg: lab(10 -1 0);
+  --hover-bg: lab(16 -1 0);
+  --danger-color: lab(55 55 30);
+  --danger-hover: lab(45 55 30);
+  --thinking-bg: lab(12 5 -8);
+  --thinking-border: lab(25 15 -20);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --text-color: lab(15 0 0);
+    --muted-color: lab(45 0 0);
+    --accent-color: lab(55 30 -40);
+    --border-color: lab(88 0 0);
+    --bg-color: lab(98 0 0);
+    --bg-secondary: lab(96 0 0);
+    --bg-tertiary: lab(93 0 0);
+    --user-bg: lab(93 0 0);
+    --user-text: lab(15 0 0);
+    --input-bg: lab(96 0 0);
+    --hover-bg: lab(92 0 0);
+    --danger-color: lab(50 50 30);
+    --danger-hover: lab(40 50 30);
+    --thinking-bg: lab(94 5 -8);
+    --thinking-border: lab(85 15 -20);
+  }
+}
+
+:root[data-theme="light"] {
+  --text-color: lab(15 0 0);
+  --muted-color: lab(45 0 0);
+  --accent-color: lab(55 30 -40);
+  --border-color: lab(88 0 0);
+  --bg-color: lab(98 0 0);
+  --bg-secondary: lab(96 0 0);
+  --bg-tertiary: lab(93 0 0);
+  --user-bg: lab(93 0 0);
+  --user-text: lab(15 0 0);
+  --input-bg: lab(96 0 0);
+  --hover-bg: lab(92 0 0);
+  --danger-color: lab(50 50 30);
+  --danger-hover: lab(40 50 30);
+  --thinking-bg: lab(94 5 -8);
+  --thinking-border: lab(85 15 -20);
+}
+
+:root[data-theme="dark"] {
+  --text-color: lab(93 0 2);
+  --muted-color: lab(51 -1 0);
+  --accent-color: lab(55 30 -40);
+  --border-color: lab(20 -2 0);
+  --bg-color: lab(7 0 0);
+  --bg-secondary: lab(10 -1 0);
+  --bg-tertiary: lab(14 -1 0);
+  --user-bg: lab(14 -1 0);
+  --user-text: lab(93 0 2);
+  --input-bg: lab(10 -1 0);
+  --hover-bg: lab(16 -1 0);
+  --danger-color: lab(55 55 30);
+  --danger-hover: lab(45 55 30);
+  --thinking-bg: lab(12 5 -8);
+  --thinking-border: lab(25 15 -20);
+}
+
+html, body {
+  @apply h-full m-0 p-0 bg-[var(--bg-color)] text-[var(--text-color)];
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-color);
+}
