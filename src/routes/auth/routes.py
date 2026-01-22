@@ -1,11 +1,11 @@
 from flask import jsonify, request
 from flask_login import login_user, logout_user, current_user
-from src.routes.auth import bp
+from src.routes.auth import auth_blueprint
 from src.models import User
 from src.db import db
 
 
-@bp.route('/login', methods=['POST'])
+@auth_blueprint.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
         return jsonify({'success': True, 'message': 'Already logged in'})
@@ -29,13 +29,13 @@ def login():
     return jsonify({'success': True, 'message': 'Login successful'})
 
 
-@bp.route('/logout', methods=['POST'])
+@auth_blueprint.route('/logout', methods=['POST'])
 def logout():
     logout_user()
     return jsonify({'success': True, 'message': 'Logged out successfully'})
 
 
-@bp.route('/register', methods=['POST'])
+@auth_blueprint.route('/register', methods=['POST'])
 def register():
     if current_user.is_authenticated:
         return jsonify({'success': False, 'message': 'Already logged in'}), 400

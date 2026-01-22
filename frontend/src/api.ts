@@ -52,7 +52,7 @@ export async function logout(): Promise<{ success: boolean; message?: string }> 
 export async function getCurrentUser(): Promise<User | null> {
     try {
         return await request<User>(`${API_BASE}/user`)
-    } catch {
+    } catch (error) {
         return null
     }
 }
@@ -123,70 +123,119 @@ export async function updateModel(model: string): Promise<void> {
 export interface StreamCallbacks {
     onChatCreated?: (chatId: number) => void
     onChunk?: (chunk: string) => void
-    onComplete?: (response: { chatId: number; content: string }) => void
+    onThinking?: (chunk: string) => void
+    onComplete?: (response: { chatId: number; content: string; searchResults?: any[] }) => void
     onError?: (error: string) => void
+    onStatus?: (status: string) => void
 }
 
 export async function streamChat(
     message: string,
     model: string,
     chatId?: number,
-    callbacks?: StreamCallbacks
+    callbacks?: StreamCallbacks,
+    spaceId?: number | null
 ): Promise<void> {
-    const response = await fetch(`${API_BASE}/generate`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({
-            query: message,
-            model: model,
-            chat_id: chatId,
-            is_followup: !!chatId,
-            use_sse: true,
-        }),
-    })
+    try {
+        const response = await fetch(`${API_BASE}/generate`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include',
+            body: JSON.stringify({
+                query: message,
+                model: model,
+                chat_id: chatId,
+                is_followup: !!chatId,
+                use_sse: true,
+                space_id: spaceId,
+            }),
+        })
 
-    if(!response.ok) {
-        callbacks?.onError?.('Failed to start chat')
-        return
-    }
+        if(!response.ok) {
+            const errorText = await response.text().catch(() => 'Unknown error')
+            callbacks?.onError?.(`Failed to start chat: ${response.status} ${errorText}`)
+            return
+        }
 
-    const reader = response.body?.getReader()
-    if(!reader) {
-        callbacks?.onError?.('No response body')
-        return
-    }
+        const reader = response.body?.getReader()
+        if(!reader) {
+            callbacks?.onError?.('No response body')
+            return
+        }
 
-    const decoder = new TextDecoder()
-    let buffer = ''
-    let fullContent = ''
+        const decoder = new TextDecoder()
+        let buffer = ''
+        let fullContent = ''
+        let chatIdFromStream: number | undefined = chatId
+        let receivedComplete = false
 
-    while(true) {
-        const {done, value} = await reader.read()
-        if(done) break
-
-        buffer += decoder.decode(value, {stream: true})
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
-
-        for(const line of lines) {
-            if(line.startsWith('data: ')) {
-                try {
-                    const data = JSON.parse(line.slice(6))
-                    if(data.type === 'chat_created') {
-                        callbacks?.onChatCreated?.(data.chat_id)
-                    } else if(data.type === 'chunk') {
-                        fullContent += data.chunk
-                        callbacks?.onChunk?.(data.chunk)
-                    } else if(data.type === 'complete') {
-                        callbacks?.onComplete?.({chatId: data.chat_id, content: fullContent})
-                    } else if(data.type === 'error') {
-                        callbacks?.onError?.(data.message)
+        try {
+            while(true) {
+                const {done, value} = await reader.read()
+                if(done) {
+                    if(!receivedComplete) {
+                        if(fullContent.trim()) {
+                            const finalChatId = chatIdFromStream || chatId || 0
+                            callbacks?.onComplete?.({chatId: finalChatId, content: fullContent})
+                        } else {
+                            callbacks?.onError?.('No content received from server')
+                        }
                     }
-                } catch {
-                    // ignore :3
+                    break
+                }
+
+                buffer += decoder.decode(value, {stream: true})
+                const lines = buffer.split('\n')
+                buffer = lines.pop() || ''
+
+                for(const line of lines) {
+                    const trimmedLine = line.trim()
+                    if(!trimmedLine) continue
+
+                    if(trimmedLine.startsWith('data: ')) {
+                        try {
+                            const jsonString = trimmedLine.slice(6)
+                            if(!jsonString) continue
+                            
+                            const data = JSON.parse(jsonString)
+                            
+                            if(data.type === 'chat_created') {
+                                chatIdFromStream = data.chat_id
+                                callbacks?.onChatCreated?.(data.chat_id)
+                            } else if(data.type === 'chunk') {
+                                const chunk = data.chunk || ''
+                                fullContent += chunk
+                                callbacks?.onChunk?.(chunk)
+                            } else if(data.type === 'thinking') {
+                                const thinkingChunk = data.chunk || ''
+                                callbacks?.onThinking?.(thinkingChunk)
+                            } else if(data.type === 'complete') {
+                                receivedComplete = true
+                                const finalContent = data.response || fullContent
+                                const searchResults = data.search_results || []
+                                callbacks?.onComplete?.({
+                                    chatId: data.chat_id || chatIdFromStream || 0, 
+                                    content: finalContent, 
+                                    searchResults: searchResults
+                                })
+                            } else if(data.type === 'error') {
+                                callbacks?.onError?.(data.message || 'Unknown error')
+                                return
+                            } else if(data.type === 'status') {
+                                callbacks?.onStatus?.(data.status)
+                            }
+                        } catch (parseError) {
+                            console.warn('Failed to parse SSE data:', parseError)
+                        }
+                    }
                 }
             }
+        } catch (streamError) {
+            callbacks?.onError?.(streamError instanceof Error ? streamError.message : 'Stream read error')
+        } finally {
+            reader.releaseLock()
         }
+    } catch (error) {
+        callbacks?.onError?.(error instanceof Error ? error.message : 'Failed to start stream')
     }
 }

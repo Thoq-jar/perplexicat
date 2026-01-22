@@ -13,12 +13,21 @@ export interface Chat {
   space_id?: number
 }
 
+export interface SearchResult {
+  title: string
+  url: string
+  content: string
+  favicon?: string
+}
+
 export interface Message {
   id: number
   content: string
   role: 'user' | 'assistant'
   chat_id: number
   created_at: string
+  thinking?: string
+  search_results?: SearchResult[]
 }
 
 export interface Space {

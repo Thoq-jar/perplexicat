@@ -14,13 +14,13 @@ def create_app() -> Flask:
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
 
-    from src.routes.main.routes import bp as main_bp
-    from src.routes.api.routes import bp as api_bp
-    from src.routes.auth.routes import bp as auth_bp
+    from src.routes.main.routes import main_blueprint
+    from src.routes.api.routes import api_blueprint
+    from src.routes.auth import auth_blueprint
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp, url_prefix='/api')
-    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(api_blueprint, url_prefix='/api')
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     with app.app_context():
         from src.models import User, Chat, Space, Message, Attachment

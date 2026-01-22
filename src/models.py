@@ -47,6 +47,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(10))
     content = db.Column(db.Text)
+    thinking = db.Column(db.Text, nullable=True)
+    search_results = db.Column(db.Text, nullable=True)
     chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     attachments = db.relationship('Attachment', backref='message', lazy='dynamic', cascade='all, delete-orphan')

@@ -29,6 +29,16 @@ export function App() {
     }
   }, [user, dataLoaded])
 
+  useEffect(() => {
+    if (user && user.theme) {
+      if (user.theme === 'system') {
+        document.documentElement.removeAttribute('data-theme')
+      } else {
+        document.documentElement.setAttribute('data-theme', user.theme)
+      }
+    }
+  }, [user])
+
   const checkAuth = async () => {
     try {
       const currentUser = await getCurrentUser()
@@ -63,9 +73,9 @@ export function App() {
 
   if (isLoading) {
     return (
-      <div class="layout">
-        <div class="main-content">
-          <div class="container">
+      <div class="flex min-h-screen bg-[var(--bg-color)] text-[var(--text-color)]">
+        <div class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+          <div class="max-w-5xl mx-auto px-4 py-8 md:px-8 w-full flex items-center justify-center h-screen">
             <p>Loading...</p>
           </div>
         </div>
@@ -84,9 +94,9 @@ export function App() {
   }
 
   return (
-    <div class="layout">
+    <div class="flex min-h-screen bg-[var(--bg-color)] text-[var(--text-color)] font-sans antialiased selection:bg-[var(--accent-color)] selection:text-white">
       <Sidebar chats={chats} spaces={spaces} />
-      <div class="main-content">
+      <div class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
         <Router>
           <Main
             path="/"

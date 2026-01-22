@@ -4,6 +4,7 @@ from flask import current_app
 from html.parser import HTMLParser
 import re
 import json
+import os
 from bs4 import BeautifulSoup
 
 
@@ -28,29 +29,22 @@ class AIService:
         try:
             soup = BeautifulSoup(html_content, "html.parser")
 
-            result_divs = []
-            selectors = [
-                "article.result",
-                "div.result",
-                "div.result-default",
-                'div[class*="result"]',
-                'article[class*="result"]',
-                ".result",
-                "div.result-header",
-                "div.result-content",
-            ]
-
-            for selector in selectors:
-                result_divs = soup.select(selector)
-                if result_divs:
-                    print(
-                        f"Found {len(result_divs)} results using selector: {selector}"
-                    )
-                    break
+            result_divs = soup.select("article.result")
+            
+            if not result_divs:
+                selectors = [
+                    "article.result-default",
+                    'article[class*="result"]',
+                    "div.result",
+                    ".result",
+                ]
+                for selector in selectors:
+                    result_divs = soup.select(selector)
+                    if result_divs:
+                        break
 
             if not result_divs:
                 all_links = soup.find_all("a", href=True)
-                print(f"No result divs found, trying all links: {len(all_links)}")
                 for link in all_links[:20]:
                     href = link.get("href", "")
                     if href and href.startswith("http") and "searx" not in href.lower():
@@ -87,68 +81,54 @@ class AIService:
 
             for result_div in result_divs[:15]:
                 try:
-                    title_elem = None
-                    link_elem = None
-                    content_elem = None
-
-                    title_elem = (
-                        result_div.find("h3")
-                        or result_div.find("h4")
-                        or result_div.find("h2")
-                        or result_div.find("a", class_="result-title")
-                        or result_div.find("a", class_="title")
-                        or result_div.find("h3", class_="result_title")
-                        or result_div.find("h4", class_="result_title")
-                        or result_div.find("a", href=True)
-                    )
-
-                    link_elem = (
-                        result_div.find("a", href=True, class_="url")
-                        or result_div.find("a", href=True, class_="result-url")
-                        or result_div.find("a", href=True, class_="result-link")
-                        or result_div.find("a", href=True)
-                    )
-
-                    if title_elem and not link_elem and title_elem.name == "a":
-                        link_elem = title_elem
-                    elif title_elem and not link_elem:
-                        link_elem = title_elem.find("a", href=True)
-
-                    content_elem = (
-                        result_div.find("p", class_="content")
-                        or result_div.find("p", class_="result-content")
-                        or result_div.find("span", class_="content")
-                        or result_div.find("div", class_="content")
-                        or result_div.find("p", class_="snippet")
-                        or result_div.find("p", class_="description")
-                        or result_div.find("span", class_="snippet")
-                        or result_div.find("div", class_="snippet")
-                        or result_div.find("p")
-                    )
-
                     title = ""
                     url = ""
                     content = ""
                     favicon = ""
 
-                    if title_elem:
-                        if title_elem.name == "a":
-                            title = title_elem.get_text(strip=True)
-                            if not url:
-                                url = title_elem.get("href", "")
-                        else:
-                            title_link = title_elem.find("a", href=True)
-                            if title_link:
-                                title = title_link.get_text(strip=True)
-                                if not url:
-                                    url = title_link.get("href", "")
-                            else:
-                                title = title_elem.get_text(strip=True)
+                    url_header = result_div.find("a", class_="url_header")
+                    if url_header:
+                        url = url_header.get("href", "")
 
-                    if link_elem and not url:
-                        url = link_elem.get("href", "")
-                        if not url and link_elem.get("data-url"):
-                            url = link_elem.get("data-url", "")
+                    h3 = result_div.find("h3")
+                    if h3:
+                        title_link = h3.find("a", href=True)
+                        if title_link:
+                            title = title_link.get_text(strip=True)
+                            if not url:
+                                url = title_link.get("href", "")
+                        else:
+                            title = h3.get_text(strip=True)
+
+                    if not url:
+                        link_elem = result_div.find("a", href=True)
+                        if link_elem:
+                            url = link_elem.get("href", "")
+
+                    content_elem = result_div.find("p", class_="content")
+                    if content_elem:
+                        content = content_elem.get_text(strip=True)
+                        if content == "This site did not provide any description.":
+                            content = ""
+                    
+                    if not content:
+                        content_elem = (
+                            result_div.find("p", class_="result-content")
+                            or result_div.find("span", class_="content")
+                            or result_div.find("div", class_="content")
+                            or result_div.find("p", class_="snippet")
+                        )
+                        if content_elem:
+                            content = content_elem.get_text(strip=True)
+
+                    if not content:
+                        all_text = result_div.get_text(separator=" ", strip=True)
+                        if title and title in all_text:
+                            all_text = all_text.replace(title, "", 1).strip()
+                        if url and url in all_text:
+                            all_text = all_text.replace(url, "", 1).strip()
+                        if len(all_text) > 30:
+                            content = all_text[:300].strip()
 
                     if url:
                         if url.startswith("//"):
@@ -160,17 +140,7 @@ class AIService:
                         elif "searx" in url.lower() or "searxng" in url.lower():
                             continue
 
-                    if content_elem:
-                        content = content_elem.get_text(strip=True)
-
-                    if not content:
-                        all_text = result_div.get_text(separator=" ", strip=True)
-                        if title and title in all_text:
-                            all_text = all_text.replace(title, "", 1).strip()
-                        if len(all_text) > 30:
-                            content = all_text[:300].strip()
-
-                    if url and url.startswith("http") and title:
+                    if url and url.startswith("http"):
                         try:
                             from urllib.parse import urlparse
 
@@ -182,6 +152,7 @@ class AIService:
                         except:
                             pass
 
+                    if url and url.startswith("http") and title:
                         results.append(
                             {
                                 "title": title[:200] or "Untitled",
@@ -191,30 +162,18 @@ class AIService:
                             }
                         )
 
-                        if len(results) >= 5:
+                        if len(results) >= 10:
                             break
-                except Exception as e:
-                    print(f"Error parsing result: {e}")
+                except Exception:
                     continue
-        except Exception as e:
-            print(f"HTML parsing error: {e}")
-            import traceback
+        except Exception:
+            pass
 
-            traceback.print_exc()
-
-        print(f"Parsed {len(results)} results from HTML")
-        for i, result in enumerate(results[:5], 1):
-            print(
-                f"  Result {i}: title='{result.get('title', '')[:50]}', url='{result.get('url', '')[:50]}'"
-            )
-        return results[:5]
+        return results[:10]
 
     def search(self, query, searxng_host):
         if not query:
-            print(f"Search skipped: no query")
             return []
-
-        print(f"Starting search for: {query}")
 
         searxng_instances = [
             "https://searxng.site/searxng",
@@ -245,7 +204,6 @@ class AIService:
                     "Sec-Fetch-Site": "none",
                     "Upgrade-Insecure-Requests": "1",
                 }
-                print(f"Trying SearXNG HTML: {url}?q={query}")
                 response = requests.get(
                     url,
                     params=params,
@@ -254,41 +212,22 @@ class AIService:
                     allow_redirects=True,
                 )
 
-                print(f"Response status: {response.status_code} from {url}")
-
                 if response.status_code in [403, 401, 429]:
-                    print(f"Access denied (status {response.status_code}) from {url}")
                     continue
 
                 if response.status_code != 200:
-                    print(f"Non-200 status ({response.status_code}) from {url}")
                     continue
 
                 html_content = response.text
-                print(f"Got HTML response from {url}, parsing...")
-                print(f"HTML length: {len(html_content)} characters")
-
-                if len(html_content) < 1000:
-                    print(f"HTML content preview: {html_content[:500]}")
-
                 results = self.parse_searxng_html(html_content)
 
                 if results:
-                    print(f"Returning {len(results)} search results from HTML parsing")
                     return results
-                else:
-                    print(f"No results found in HTML from {url}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request exception for {instance}: {e}")
+            except requests.exceptions.RequestException:
                 continue
-            except Exception as e:
-                print(f"Unexpected error for {instance}: {e}")
-                import traceback
-
-                traceback.print_exc()
+            except Exception:
                 continue
 
-        print("No search results found from any source")
         return []
 
     def generate_response(
@@ -299,25 +238,27 @@ class AIService:
         search_results=None,
         searxng_host=None,
     ):
-        system_prompt = """You are Perplexicat, a helpful AI assistant. You provide accurate, helpful, and concise responses. When search results are provided, prioritize using that information in your response. Use the chat context to maintain conversation continuity."""
+        system_prompt = """You are Perplexicat, a helpful AI assistant. You provide accurate, helpful, and concise responses. When search results are provided, prioritize using that information in your response. Use the chat context to maintain conversation continuity.
+
+IMPORTANT: Search results attached to user messages are NOT from the user - they are automatically retrieved web results provided by the system to help you answer. The user's actual question is only the text before the search results section."""
 
         messages = []
 
         messages.append({"role": "system", "content": system_prompt})
 
         if chat_context:
-            for msg in chat_context:
-                role = "user" if msg.role == "user" else "assistant"
-                messages.append({"role": role, "content": msg.content})
+            for message in chat_context:
+                role = "user" if message.role == "user" else "assistant"
+                messages.append({"role": role, "content": message.content})
 
         user_content = query
         if search_results:
-            search_context = "\n\nSearch results (prioritize this information):\n"
-            for idx, result in enumerate(search_results, 1):
+            search_context = "\n\n---\nSYSTEM-PROVIDED SEARCH RESULTS (not from user):\n"
+            for index, result in enumerate(search_results, 1):
                 title = result.get("title", "Untitled")
                 url = result.get("url", "")
                 content = result.get("content", "")
-                search_context += f"{idx}. {title} ({url})\n"
+                search_context += f"{index}. {title} ({url})\n"
                 if content:
                     search_context += f"   {content}\n"
             user_content = f"{query}\n\n{search_context}"
@@ -331,7 +272,6 @@ class AIService:
             )
             return response.message.content.strip()
         except Exception as exception:
-            print(f"Error in generation: {exception}")
             return f"Error: {str(exception)}"
 
     def generate_response_stream(
@@ -342,56 +282,110 @@ class AIService:
         search_results=None,
         searxng_host=None,
     ):
-        system_prompt = """You are Perplexicat, a helpful AI assistant. You provide accurate, helpful, and concise responses. When search results are provided, prioritize using that information in your response. Use the chat context to maintain conversation continuity."""
+        import time
+        start_time = time.time()
+        
+        system_prompt = """You are Perplexicat, a helpful AI assistant. You provide accurate, helpful, and concise responses. When search results are provided, prioritize using that information in your response. Use the chat context to maintain conversation continuity.
+
+IMPORTANT: Search results attached to user messages are NOT from the user - they are automatically retrieved web results provided by the system to help you answer. The user's actual question is only the text before the search results section."""
 
         messages = []
-
         messages.append({"role": "system", "content": system_prompt})
 
         if chat_context:
-            for msg in chat_context:
-                role = "user" if msg.role == "user" else "assistant"
-                messages.append({"role": role, "content": msg.content})
+            recent_context = chat_context[-10:] if len(chat_context) > 10 else chat_context
+            for message in recent_context:
+                role = "user" if message.role == "user" else "assistant"
+                content = message.content[:1500] if len(message.content) > 1500 else message.content
+                messages.append({"role": role, "content": content})
 
         user_content = query
         if search_results:
-            search_context = "\n\nSearch results (prioritize this information):\n"
-            for idx, result in enumerate(search_results, 1):
-                title = result.get("title", "Untitled")
-                url = result.get("url", "")
-                content = result.get("content", "")
-                search_context += f"{idx}. {title} ({url})\n"
+            search_context = "\n\n---\nSYSTEM-PROVIDED SEARCH RESULTS (not from user):\n"
+            for index, result in enumerate(search_results[:3], 1):
+                title = result.get("title", "Untitled")[:80]
+                url = result.get("url", "")[:80]
+                content = result.get("content", "")[:200]
+                search_context += f"{index}. {title}\n"
                 if content:
                     search_context += f"   {content}\n"
             user_content = f"{query}\n\n{search_context}"
 
         messages.append({"role": "user", "content": user_content})
-
+        
         try:
             full_response = ""
-            stream = self.ollama_client.chat(
-                model=model_name,
-                messages=messages,
+            import requests
+            ollama_host = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+            ollama_url = f"{ollama_host}/api/chat"
+            
+            payload = {
+                "model": model_name,
+                "messages": messages,
+                "stream": True
+            }
+            
+            http_stream = requests.post(
+                ollama_url,
+                json=payload,
                 stream=True,
+                timeout=None
             )
+            http_stream.raise_for_status()
+            
+            yield ""
+            
+            last_chunk_time = time.time()
+            timeout_seconds = 300
+            
+            for line in http_stream.iter_lines(decode_unicode=True):
+                if not line:
+                    continue
+                    
+                try:
+                    chunk = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                current_time = time.time()
+                
+                if current_time - last_chunk_time > timeout_seconds:
+                    yield "\n\n[Stream timeout after {timeout_seconds} seconds]"
+                    break
 
-            for chunk in stream:
-                if chunk and hasattr(chunk, "message"):
-                    chunk_text = (
-                        chunk.message.content
-                        if hasattr(chunk.message, "content")
-                        else None
-                    )
+                if chunk:
+                    last_chunk_time = current_time
+                    
+                    chunk_text = None
+                    thinking_text = None
+                    
+                    try:
+                        if isinstance(chunk, dict):
+                            message = chunk.get("message", {})
+                            if isinstance(message, dict):
+                                chunk_text = message.get("content") or None
+                                thinking_text = message.get("thinking") or None
+                            if chunk.get("done", False):
+                                break
+                    except Exception:
+                        continue
+                    
                     if chunk_text:
                         full_response += chunk_text
-                        yield chunk_text
+                        yield {"type": "content", "text": chunk_text}
+                    elif thinking_text:
+                        yield {"type": "thinking", "text": thinking_text}
 
-                if hasattr(chunk, "done") and chunk.done:
-                    break
+                    done = False
+                    if isinstance(chunk, dict):
+                        done = chunk.get("done", False)
+                    elif hasattr(chunk, "done"):
+                        done = chunk.done
+                    
+                    if done:
+                        break
 
             return full_response.strip()
         except Exception as exception:
-            print(f"Error in streaming generation: {exception}")
             yield f"Error: {str(exception)}"
             return f"Error: {str(exception)}"
 

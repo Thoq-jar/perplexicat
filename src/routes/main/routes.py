@@ -3,10 +3,10 @@ from flask_login import current_user, login_required
 from src.models import Chat, Space, Message
 from src.db import db
 
-bp = Blueprint('main', __name__)
+main_blueprint = Blueprint('main', __name__)
 
 
-@bp.route('/')
+@main_blueprint.route('/')
 def index() -> str:
     chats = []
     spaces = []
@@ -16,7 +16,7 @@ def index() -> str:
     return render_template('main.html', chats=chats, spaces=spaces)
 
 
-@bp.route('/chat/<int:chat_id>')
+@main_blueprint.route('/chat/<int:chat_id>')
 @login_required
 def chat_view(chat_id):
     chat = Chat.query.get_or_404(chat_id)
@@ -28,7 +28,7 @@ def chat_view(chat_id):
     return render_template('chat.html', chat=chat, chats=chats, spaces=spaces, query_param=query_param)
 
 
-@bp.route('/spaces')
+@main_blueprint.route('/spaces')
 @login_required
 def spaces_list():
     chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).limit(10).all()
@@ -36,7 +36,7 @@ def spaces_list():
     return render_template('spaces.html', chats=chats, spaces=spaces)
 
 
-@bp.route('/space/<int:space_id>')
+@main_blueprint.route('/space/<int:space_id>')
 @login_required
 def space_view(space_id):
     space = Space.query.get_or_404(space_id)
@@ -48,7 +48,7 @@ def space_view(space_id):
     return render_template('space.html', space=space, chats=chats, all_chats=all_chats, spaces=spaces)
 
 
-@bp.route('/space/new', methods=['POST'])
+@main_blueprint.route('/space/new', methods=['POST'])
 @login_required
 def create_space():
     name = request.form.get('name')
@@ -59,7 +59,7 @@ def create_space():
     return redirect(url_for('main.spaces_list'))
 
 
-@bp.route('/library')
+@main_blueprint.route('/library')
 @login_required
 def library():
     chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).all()
@@ -67,7 +67,7 @@ def library():
     return render_template('library.html', chats=chats, spaces=spaces)
 
 
-@bp.route('/settings')
+@main_blueprint.route('/settings')
 @login_required
 def settings():
     chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).limit(10).all()
