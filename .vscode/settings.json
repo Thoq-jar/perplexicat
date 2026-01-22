@@ -3,9 +3,10 @@
         "beautifulsoup",
         "dotenv",
         "perplexicat",
+        "SEARXNG",
         "sqlalchemy",
         "werkzeug"
     ],
     "editor.defaultFormatter": "charliermarsh.ruff",
-    "python.languageServer": "astral-sh.ty"
+    "ty.disableLanguageServices": false
 }

@@ -11,8 +11,8 @@ from src.models import Chat, Message, Space, User
 from src.db import db
 from src.ai import ai_service
 import json
-import time
 from datetime import datetime, timedelta
+
 
 api_blueprint = Blueprint("api", __name__)
 
@@ -71,19 +71,26 @@ def generate():
                 .order_by(Message.created_at.asc())
                 .all()
             )
-            
+
             user_message = None
             if all_messages:
-                user_messages = [message for message in all_messages if message.role == "user"]
+                user_messages = [
+                    message for message in all_messages if message.role == "user"
+                ]
                 if user_messages:
                     last_user_message = user_messages[-1]
-                    time_diff = datetime.utcnow() - last_user_message.created_at.replace(tzinfo=None) if last_user_message.created_at else timedelta(seconds=999)
-                    
-                    if (
-                        last_user_message.content == query and 
-                        time_diff < timedelta(seconds=2)):
+                    time_diff = (
+                        datetime.utcnow()
+                        - last_user_message.created_at.replace(tzinfo=None)
+                        if last_user_message.created_at
+                        else timedelta(seconds=999)
+                    )
+
+                    if last_user_message.content == query and time_diff < timedelta(
+                        seconds=2
+                    ):
                         user_message = last_user_message
-            
+
             if not user_message:
                 user_message = Message(role="user", content=query, chat=chat)
                 db.session.add(user_message)
@@ -94,9 +101,15 @@ def generate():
                 .order_by(Message.created_at.asc())
                 .all()
             )
-            chat_context = [message for message in all_messages if message.id != user_message.id]
-            
-            chat_context = [message for message in chat_context if not (message.role == "user" and message.content == query)]
+            chat_context = [
+                message for message in all_messages if message.id != user_message.id
+            ]
+
+            chat_context = [
+                message
+                for message in chat_context
+                if not (message.role == "user" and message.content == query)
+            ]
 
             search_results = []
             searxng_host = current_app.config.get("SEARXNG_HOST")
@@ -106,7 +119,7 @@ def generate():
                 search_results = ai_service.search(query, searxng_host)
 
             yield f"data: {json.dumps({'type': 'status', 'status': 'thinking'})}\n\n"
-            
+
             assistant_content = ""
             thinking_content = ""
             try:
@@ -118,11 +131,11 @@ def generate():
                 ):
                     if not chunk:
                         continue
-                        
+
                     if isinstance(chunk, dict):
                         chunk_type = chunk.get("type")
                         chunk_text = chunk.get("text", "")
-                        
+
                         if chunk_type == "thinking":
                             thinking_content += chunk_text
                             yield f"data: {json.dumps({'type': 'thinking', 'chunk': chunk_text})}\n\n"
@@ -131,25 +144,27 @@ def generate():
                             yield f"data: {json.dumps({'type': 'chunk', 'chunk': chunk_text})}\n\n"
                     else:
                         assistant_content += chunk
-                        chunk_data = f"data: {json.dumps({'type': 'chunk', 'chunk': chunk})}\n\n"
+                        chunk_data = (
+                            f"data: {json.dumps({'type': 'chunk', 'chunk': chunk})}\n\n"
+                        )
                         yield chunk_data
-                    
+
             except Exception as generation_error:
                 error_message = f"Error generating response: {str(generation_error)}"
                 assistant_content = error_message
                 yield f"data: {json.dumps({'type': 'error', 'message': error_message})}\n\n"
                 return
-            
+
             if not assistant_content or not assistant_content.strip():
                 assistant_content = "I apologize, but I wasn't able to generate a response. Please try again."
 
             search_results_json = json.dumps(search_results) if search_results else None
             assistant_message = Message(
-                role="assistant", 
-                content=assistant_content, 
+                role="assistant",
+                content=assistant_content,
                 thinking=thinking_content if thinking_content else None,
                 search_results=search_results_json,
-                chat=chat
+                chat=chat,
             )
             db.session.add(assistant_message)
             db.session.commit()
@@ -212,19 +227,26 @@ def generate():
                 .order_by(Message.created_at.asc())
                 .all()
             )
-            
+
             user_message = None
             if all_messages:
-                user_messages = [message for message in all_messages if message.role == "user"]
+                user_messages = [
+                    message for message in all_messages if message.role == "user"
+                ]
                 if user_messages:
                     last_user_message = user_messages[-1]
-                    time_diff = datetime.utcnow() - last_user_message.created_at.replace(tzinfo=None) if last_user_message.created_at else timedelta(seconds=999)
-                    
-                    if (
-                        last_user_message.content == query and 
-                        time_diff < timedelta(seconds=2)):
+                    time_diff = (
+                        datetime.utcnow()
+                        - last_user_message.created_at.replace(tzinfo=None)
+                        if last_user_message.created_at
+                        else timedelta(seconds=999)
+                    )
+
+                    if last_user_message.content == query and time_diff < timedelta(
+                        seconds=2
+                    ):
                         user_message = last_user_message
-            
+
             if not user_message:
                 user_message = Message(role="user", content=query, chat=chat)
                 db.session.add(user_message)
@@ -235,9 +257,15 @@ def generate():
                 .order_by(Message.created_at.asc())
                 .all()
             )
-            chat_context = [message for message in all_messages if message.id != user_message.id]
-            
-            chat_context = [message for message in chat_context if not (message.role == "user" and message.content == query)]
+            chat_context = [
+                message for message in all_messages if message.id != user_message.id
+            ]
+
+            chat_context = [
+                message
+                for message in chat_context
+                if not (message.role == "user" and message.content == query)
+            ]
 
             search_results = []
             searxng_host = current_app.config.get("SEARXNG_HOST")
@@ -253,11 +281,11 @@ def generate():
 
             search_results_json = json.dumps(search_results) if search_results else None
             assistant_message = Message(
-                role="assistant", 
-                content=assistant_content, 
+                role="assistant",
+                content=assistant_content,
                 thinking=None,
                 search_results=search_results_json,
-                chat=chat
+                chat=chat,
             )
             db.session.add(assistant_message)
             db.session.commit()
@@ -277,25 +305,36 @@ def generate():
 @api_blueprint.route("/user", methods=["GET"])
 @login_required
 def get_user():
-    return jsonify({
-        "id": current_user.id,
-        "username": current_user.username,
-        "theme": getattr(current_user, 'theme', 'system'),
-        "selected_model": getattr(current_user, 'selected_model', 'qwen3-vl:8b'),
-    })
+    return jsonify(
+        {
+            "id": current_user.id,
+            "username": current_user.username,
+            "theme": getattr(current_user, "theme", "system"),
+            "selected_model": getattr(current_user, "selected_model", "qwen3-vl:8b"),
+        }
+    )
 
 
 @api_blueprint.route("/chats", methods=["GET"])
 @login_required
 def get_chats():
-    chats = Chat.query.filter_by(user_id=current_user.id).order_by(Chat.created_at.desc()).all()
-    return jsonify([{ 
-        "id": chat.id,
-        "title": chat.title,
-        "created_at": chat.created_at.isoformat() if chat.created_at else None,
-        "user_id": chat.user_id,
-        "space_id": chat.space_id
-    } for chat in chats])
+    chats = (
+        Chat.query.filter_by(user_id=current_user.id)
+        .order_by(Chat.created_at.desc())
+        .all()
+    )
+    return jsonify(
+        [
+            {
+                "id": chat.id,
+                "title": chat.title,
+                "created_at": chat.created_at.isoformat() if chat.created_at else None,
+                "user_id": chat.user_id,
+                "space_id": chat.space_id,
+            }
+            for chat in chats
+        ]
+    )
 
 
 @api_blueprint.route("/chat/<int:chat_id>", methods=["GET"])
@@ -304,9 +343,13 @@ def get_chat(chat_id):
     chat = Chat.query.get_or_404(chat_id)
     if chat.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
-    
-    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.created_at.asc()).all()
-    
+
+    messages = (
+        Message.query.filter_by(chat_id=chat_id)
+        .order_by(Message.created_at.asc())
+        .all()
+    )
+
     messages_data = []
     for message in messages:
         message_data = {
@@ -314,7 +357,9 @@ def get_chat(chat_id):
             "content": message.content,
             "role": message.role,
             "chat_id": message.chat_id,
-            "created_at": message.created_at.isoformat() if message.created_at else None
+            "created_at": message.created_at.isoformat()
+            if message.created_at
+            else None,
         }
         if message.thinking:
             message_data["thinking"] = message.thinking
@@ -324,29 +369,39 @@ def get_chat(chat_id):
             except (json.JSONDecodeError, TypeError):
                 message_data["search_results"] = []
         messages_data.append(message_data)
-    
-    return jsonify({
-        "chat": {
-            "id": chat.id,
-            "title": chat.title,
-            "created_at": chat.created_at.isoformat() if chat.created_at else None,
-            "user_id": chat.user_id,
-            "space_id": chat.space_id
-        },
-        "messages": messages_data
-    })
+
+    return jsonify(
+        {
+            "chat": {
+                "id": chat.id,
+                "title": chat.title,
+                "created_at": chat.created_at.isoformat() if chat.created_at else None,
+                "user_id": chat.user_id,
+                "space_id": chat.space_id,
+            },
+            "messages": messages_data,
+        }
+    )
 
 
 @api_blueprint.route("/spaces", methods=["GET"])
 @login_required
 def get_spaces():
     spaces = Space.query.filter_by(user_id=current_user.id).all()
-    return jsonify([{ 
-        "id": space.id,
-        "name": space.name,
-        "user_id": space.user_id,
-        "chats": [{"id": chat.id} for chat in Chat.query.filter_by(space_id=space.id).all()]
-    } for space in spaces])
+    return jsonify(
+        [
+            {
+                "id": space.id,
+                "name": space.name,
+                "user_id": space.user_id,
+                "chats": [
+                    {"id": chat.id}
+                    for chat in Chat.query.filter_by(space_id=space.id).all()
+                ],
+            }
+            for space in spaces
+        ]
+    )
 
 
 @api_blueprint.route("/space/<int:space_id>", methods=["GET"])
@@ -355,22 +410,27 @@ def get_space(space_id):
     space = Space.query.get_or_404(space_id)
     if space.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
-    
-    chats = Chat.query.filter_by(space_id=space_id).order_by(Chat.created_at.desc()).all()
-    return jsonify({
-        "space": {
-            "id": space.id,
-            "name": space.name,
-            "user_id": space.user_id
-        },
-        "chats": [{ 
-            "id": chat.id,
-            "title": chat.title,
-            "created_at": chat.created_at.isoformat() if chat.created_at else None,
-            "user_id": chat.user_id,
-            "space_id": chat.space_id
-        } for chat in chats]
-    })
+
+    chats = (
+        Chat.query.filter_by(space_id=space_id).order_by(Chat.created_at.desc()).all()
+    )
+    return jsonify(
+        {
+            "space": {"id": space.id, "name": space.name, "user_id": space.user_id},
+            "chats": [
+                {
+                    "id": chat.id,
+                    "title": chat.title,
+                    "created_at": chat.created_at.isoformat()
+                    if chat.created_at
+                    else None,
+                    "user_id": chat.user_id,
+                    "space_id": chat.space_id,
+                }
+                for chat in chats
+            ],
+        }
+    )
 
 
 @api_blueprint.route("/create_space", methods=["POST"])
@@ -378,19 +438,15 @@ def get_space(space_id):
 def create_space():
     data = request.get_json()
     name = data.get("name", "").strip()
-    
+
     if not name:
         return jsonify({"error": "Space name is required"}), 400
-    
+
     space = Space(name=name, user_id=current_user.id)
     db.session.add(space)
     db.session.commit()
-    
-    return jsonify({
-        "id": space.id,
-        "name": space.name,
-        "user_id": space.user_id
-    })
+
+    return jsonify({"id": space.id, "name": space.name, "user_id": space.user_id})
 
 
 @api_blueprint.route("/update_chat_title/<int:chat_id>", methods=["POST"])
@@ -399,14 +455,14 @@ def update_chat_title(chat_id):
     chat = Chat.query.get_or_404(chat_id)
     if chat.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     data = request.get_json()
     title = data.get("title", "").strip()
-    
+
     if title:
         chat.title = title
         db.session.commit()
-    
+
     return jsonify({"success": True})
 
 
@@ -415,11 +471,11 @@ def update_chat_title(chat_id):
 def update_theme():
     data = request.get_json()
     theme = data.get("theme", "system")
-    
-    if hasattr(current_user, 'theme'):
+
+    if hasattr(current_user, "theme"):
         current_user.theme = theme
         db.session.commit()
-    
+
     return jsonify({"success": True})
 
 
@@ -428,11 +484,11 @@ def update_theme():
 def update_model():
     data = request.get_json()
     model = data.get("model")
-    
-    if hasattr(current_user, 'selected_model'):
+
+    if hasattr(current_user, "selected_model"):
         current_user.selected_model = model
         db.session.commit()
-    
+
     return jsonify({"success": True})
 
 
@@ -442,11 +498,11 @@ def move_chat_to_space_api():
     data = request.get_json()
     chat_id = data.get("chat_id")
     space_id = data.get("space_id")
-    
+
     chat = Chat.query.get_or_404(chat_id)
     if chat.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     if space_id is None:
         chat.space_id = None
     else:
@@ -454,7 +510,7 @@ def move_chat_to_space_api():
         if not space or space.user_id != current_user.id:
             return jsonify({"error": "Invalid space"}), 400
         chat.space_id = space_id
-    
+
     db.session.commit()
     return jsonify({"success": True})
 
@@ -547,7 +603,7 @@ def update_username():
         current_user.username = new_username
         db.session.commit()
         return jsonify({"success": True})
-    except Exception as error:
+    except Exception:
         db.session.rollback()
         return jsonify({"error": "Failed to update username"}), 500
 
@@ -568,7 +624,7 @@ def update_password():
         current_user.set_password(new_password)
         db.session.commit()
         return jsonify({"success": True})
-    except Exception as error:
+    except Exception:
         db.session.rollback()
         return jsonify({"error": "Failed to update password"}), 500
 
@@ -592,6 +648,6 @@ def delete_account():
         db.session.commit()
 
         return jsonify({"success": True})
-    except Exception as error:
+    except Exception:
         db.session.rollback()
         return jsonify({"error": "Failed to delete account"}), 500
